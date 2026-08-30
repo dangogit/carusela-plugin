@@ -44,7 +44,9 @@ get_config  ->  published.features
 ```
 
 If `groups` is false, every group is invisible. If `community` is false, so is the feed and
-everything on it. Creating into a switched-off surface succeeds and reports success.
+everything on it. `manage_group` refuses to create into a switched-off surface, so nothing NEW
+lands there, but anything created before that refusal existed is still sitting where nobody can
+see it. That is what this check is for.
 
 Feature flags are operator-controlled and the owner cannot flip them. If content sits behind a
 false flag, the finding is "ask Carusela to enable X", not "enable X".
@@ -75,14 +77,15 @@ Do not pass `confirm: true` while auditing.
 list_content  type: "tutorial"
 ```
 
-Tutorials do **not** resolve a thumbnail from `video_url` the way lessons, recordings and AI
-agents do. Any tutorial with a `video_url` and a null `thumbnail_url` renders blank. Fix with
-`attach_media action: "resolve"` and an update.
+Every kind that carries a video resolves its own poster frame on write now, so a null
+`thumbnail_url` beside a `video_url` means the resolver could not reach the provider at the time
+of writing, not that the kind does not do it. Fix with an update that re-sends the same
+`video_url`; resolution runs again and fills the empty value.
 
 ### 5. Everything at one tier
 
 ```
-get_member_stats  include_tiers: true
+get_club_overview                                    -> access_tiers
 list_content  type: "course"  min_tier_level: 0
 ```
 

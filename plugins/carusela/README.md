@@ -44,21 +44,20 @@ There are no repository, deploy, DNS or domain tools here, and the platform stor
 corresponding credentials. Claude Code may already hold your own GitHub and Vercel sessions
 locally; those never enter Carusela MCP.
 
-## Rough edges the skills work around
+## Things about this surface worth knowing
 
-Real behaviours of the surface today. Each one is tracked, and the skills tell Claude how to
-avoid it meanwhile, so you should not have to think about any of them:
+Not bugs, and the skills handle all of them for you. Listed because each one is a place where the
+obvious guess is wrong:
 
-- Recordings, tutorials and guides join a category by carrying its **exact name in `tags`**, not
-  through a `category` field. A near miss attaches nothing and looks fine from both sides.
-- `difficulty` accepts exactly four values on recordings, tutorials and guides:
-  `מתחילים`, `ביניים`, `מתקדמים`, `כל הרמות`. Anything else is refused by the database.
-- Guides and AI agents are created **published**. Recordings and tutorials are created as drafts.
-- Tutorials do not resolve a poster frame from `video_url` the way lessons, recordings and AI
-  agents do.
-- The access-tier ladder is readable only from `get_member_stats`.
-- `manage_group` succeeds in a club whose `groups` feature is switched off, and the group is then
-  invisible to everyone.
+- **Recordings, tutorials and guides join a category by carrying its exact name in `tags`**, not
+  through a `category` field. Only groups, courses and AI agents have a real one. A near miss
+  attaches nothing, so `manage_category list` reports a usage count per category and an empty one
+  is visible immediately.
+- **`difficulty` is a closed set** on recordings, tutorials and guides: `מתחילים`, `ביניים`,
+  `מתקדמים`, `כל הרמות`. Anything else is refused by name with the four values in the message.
+- **The four library kinds have different create defaults.** A guide and an AI agent go live the
+  moment they are created; a recording and a tutorial start as drafts. All four accept
+  `is_published` on create, so staging a batch nobody has reviewed means passing it explicitly.
 
 ## Safety
 

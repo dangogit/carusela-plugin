@@ -16,9 +16,8 @@ account that owns the club. Once.
 ## Why a plugin and not just the MCP
 
 The connection on its own gives Claude the tools. It does not tell Claude how the surface is
-shaped, so it guesses, and several of the natural guesses are wrong in ways that **report
-success**: content created live when you wanted a draft, a category attached to nothing, a group
-in a club where groups are switched off.
+shaped, so it guesses, and several of the natural guesses are quietly wrong: content created live
+when you wanted a draft, a category that looks attached and is not, a tier that does not exist.
 
 The six skills are the part that stops that.
 

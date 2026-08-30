@@ -20,22 +20,20 @@ as creating a product, a price or a plan, and MCP cannot do the second thing at 
 
 ## Read the ladder first
 
-Today the only tool that returns it is:
-
-```
-get_member_stats  include_tiers: true
-```
+`get_club_overview` returns it as `access_tiers`, and you are calling that before any write
+anyway:
 
 ```json
-"tiers": [
-  { "level": 0, "name": "חינם",    "members": 2 },
-  { "level": 1, "name": "בסיסי",   "members": 0 },
-  { "level": 2, "name": "פרימיום", "members": 0 }
+"access_tiers": [
+  { "level": 0, "name": "חינם" },
+  { "level": 1, "name": "בסיסי" },
+  { "level": 2, "name": "פרימיום" }
 ]
 ```
 
-It is a member-statistics tool and the ladder comes out as a side effect. That is a known rough
-edge, not a sign you are holding it wrong.
+`get_member_stats` with `include_tiers: true` also returns it, with a member count per tier.
+Use that one only when the counts are the question: it is a tool about people, and gating content
+is not.
 
 ## Apply it
 

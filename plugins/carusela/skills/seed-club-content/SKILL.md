@@ -61,11 +61,9 @@ links go inside its `sections` text.
 ## Video: let the provider fill it in
 
 Pass a Bunny, Vimeo or YouTube URL as `video_url` and leave `thumbnail_url` empty. Lessons,
-recordings and AI agents resolve the poster frame and the runtime from the provider on write. A
-value you pass is never overwritten by that, so only pass one if you mean to override.
-
-**Tutorials do not resolve it.** For a tutorial, call `attach_media` with `action: "resolve"`
-first and pass the `thumbnail_url` it returns.
+recordings, tutorials and AI agents all resolve the poster frame from the provider on write, and
+lessons and recordings resolve the runtime too. A value you pass is never overwritten by that, so
+only pass one if you mean to override.
 
 To upload a file rather than reference a video: `attach_media` with `action: "upload_target"`,
 then PUT the bytes to the `upload_url` it returns with the right `Content-Type`, then use the
@@ -83,10 +81,15 @@ than dropped, so a refusal is information, not a failure.
 | `tags` | yes | yes | yes | **no** |
 | `category` | **no** | **no** | **no** | **required on create** |
 | body | `learning_points` | `steps` | `sections` | — |
-| `is_published` on create | draft | draft | **live** | **live** |
+| default `is_published` | draft | draft | **live** | **live** |
 
 `steps` and `sections` are **update only**. Create the item, then update it with its body. That
 is two calls per guide and there is no way around it today.
+
+**The `is_published` row is a DEFAULT, not a rule.** All four accept the field on create, so a
+batch nobody has reviewed is staged by passing `is_published: false` explicitly. Omit it and you
+get the row above, which differs by kind: a guide and an AI agent go live the moment they are
+created.
 
 ## Categories: the trap
 

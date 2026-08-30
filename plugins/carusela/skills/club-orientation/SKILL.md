@@ -85,10 +85,11 @@ the part that matters.
 
 ## Two traps that cost real time
 
-**Features can be off.** A club with `features.groups: false` still lets `manage_group` create a
-group, and reports success. Nobody will ever see it. Read `features` in `get_config` before you
-build on a surface, and if the flag is off, say that it needs Carusela to enable it before you
-create anything there.
+**Features can be off, and the surface will tell you.** A club with `features.groups: false` has
+no groups area, and `manage_group` now REFUSES to create one rather than leaving an invisible row
+behind. Read that refusal as information: the flag is operator-controlled, so the answer is to
+tell the owner it needs Carusela to enable it, not to look for another way in. `get_config` shows
+which features are on before you plan around one.
 
 **Categories for recordings, tutorials and guides are not a `category` field.** Those three
 join a category by carrying its exact name in `tags`. `manage_library_item` refuses `category`
