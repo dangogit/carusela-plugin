@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "carusela": {
+      "type": "http",
+      "url": "https://carusela.com/api/mcp"
+    }
+  }
+}
