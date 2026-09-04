@@ -82,6 +82,11 @@ Every kind that carries a video resolves its own poster frame on write now, so a
 of writing, not that the kind does not do it. Fix with an update that re-sends the same
 `video_url`; resolution runs again and fills the empty value.
 
+For items with no `video_url` at all, that fix does not apply; there is nothing to resolve a
+frame from. If `generate_missing_covers` is available for this club, that is the fix: see
+`seed-club-content`'s Covers section for how to run it (dry run, ask once, batches, and what
+each stop reason means).
+
 ### 5. Everything at one tier
 
 ```
