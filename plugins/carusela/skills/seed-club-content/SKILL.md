@@ -31,6 +31,7 @@ to hold it.
 4. Create content.
 5. Publish and gate deliberately.
 6. `audit-club-content`.
+7. Generate covers for what still has none. See Covers below.
 
 ## Courses carry their lessons
 
@@ -130,6 +131,49 @@ want. A partial list is refused. One call with the full list sets the order; you
 items one at a time.
 
 Groups have no published state at all. `is_private` is their only visibility axis.
+
+## Covers
+
+Once content is created and reviewed, whatever still has no cover image is the last thing to
+close. Two tools do this: `generate_cover` makes one item's image, `generate_missing_covers`
+walks the whole club.
+
+Check the tool exists first. If `generate_missing_covers` is not in `tools/list`, the club is on
+an older MCP version that does not have it. Say so and skip this step entirely; do not try to
+fake it with `generate_cover` in a loop.
+
+Start with a dry run:
+
+```
+generate_missing_covers  dry_run: true
+```
+
+Tell the owner how many items have no cover and that each one this actually generates spends
+their own OpenAI credit, counted against the club's daily cover limit. Ask once. Do not generate
+a single image before they say go.
+
+Once they agree, run it in batches rather than one call for everything:
+
+```
+generate_missing_covers  limit: 10
+```
+
+Report each batch as it lands (generated, skipped, and how many are still missing) and share the
+club's URL so the owner can watch the cards fill in live rather than wait for a final count.
+Keep calling it with the same `limit` until `remaining_missing` is 0 or it stops on a refusal.
+
+A batch can end on `stopped_reason` before it runs out of items:
+
+- **`cover_generation_disabled`**: the club switched this off. Point the owner at
+  admin > integrations > cover generation and stop; nothing else here can turn it back on.
+- **`openai_key_missing`**: the club has no OpenAI key on file. The owner sets it in
+  admin > integrations, not you; there is nowhere in MCP to hold that key.
+- **`cover_daily_limit_reached`**: the club's daily cap for the day is spent. Tell the owner how
+  many items are still missing a cover, and that they can either come back tomorrow or raise the
+  limit in the same admin > integrations screen.
+
+Every one of these is the owner's call, not a bug to route around. Report the stop, name the
+fix, and move on to closing out the rest of the report.
 
 ## Report honestly
 
