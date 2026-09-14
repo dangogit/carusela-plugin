@@ -83,13 +83,18 @@ Tell the user which door, and say plainly that this surface will not do it. Then
 the part you can do. A refusal the user cannot act on is worse than no answer, so the door is
 the part that matters.
 
-## Two traps that cost real time
+## Three traps that cost real time
 
 **Features can be off, and the surface will tell you.** A club with `features.groups: false` has
 no groups area, and `manage_group` now REFUSES to create one rather than leaving an invisible row
 behind. Read that refusal as information: the flag is operator-controlled, so the answer is to
 tell the owner it needs Carusela to enable it, not to look for another way in. `get_config` shows
 which features are on before you plan around one.
+
+**Before Launch, a created course or library item is published, not a draft.** Nobody can reach a
+pre-launch club, so the draft would hide the work from the owner rather than protect a member;
+after Launch the old per-kind defaults return. `manage_course` says which happened in
+`publish_default`. See `seed-club-content`.
 
 **Categories for recordings, tutorials and guides are not a `category` field.** Those three
 join a category by carrying its exact name in `tags`. `manage_library_item` refuses `category`

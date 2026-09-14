@@ -14,9 +14,14 @@ up video id, and it does not get quietly dropped either. Create it with the sour
 and say in the report which items had no video and why. A club full of dead players is worse
 than a club with a gap the owner knows about.
 
-**Never publish a batch before the owner has seen it.** Some kinds go live the moment they are
-created (see the table below), which means the decision is made for you unless you plan for it.
-Create, review, then publish.
+**Never publish a batch before the owner has seen it, in a club that has already launched.**
+There the create is a publication: members are in, and a course that appears while you are still
+building it has been seen. Create, review, then publish.
+
+Before Launch this does not apply, and following it anyway is the mistake. Nobody can reach a
+pre-launch club, so a draft hides the import from the one person who wanted it, and the owner
+watching the club fill up sees an empty screen. `manage_course` and `manage_library_item` publish
+on create while the club has not launched; let them.
 
 **Never write a second copy because the first one refused a field.** A refused field means that
 kind has no column for it. Find where the value belongs; do not create a different content type
@@ -82,15 +87,23 @@ than dropped, so a refusal is information, not a failure.
 | `tags` | yes | yes | yes | **no** |
 | `category` | **no** | **no** | **no** | **required on create** |
 | body | `learning_points` | `steps` | `sections` | — |
-| default `is_published` | draft | draft | **live** | **live** |
+| default `is_published`, launched club | draft | draft | **live** | **live** |
+| default `is_published`, before Launch | **live** | **live** | **live** | **live** |
 
 `steps` and `sections` are **update only**. Create the item, then update it with its body. That
 is two calls per guide and there is no way around it today.
 
 **The `is_published` row is a DEFAULT, not a rule.** All four accept the field on create, so a
-batch nobody has reviewed is staged by passing `is_published: false` explicitly. Omit it and you
-get the row above, which differs by kind: a guide and an AI agent go live the moment they are
-created.
+batch nobody has reviewed is staged by passing `is_published: false` explicitly. Omit it and
+before Launch all four go live; after Launch you get the per-kind row above, where a guide and an
+AI agent go live the moment they are created and a recording and a tutorial do not.
+
+The same split applies to courses. `manage_course` publishes a created course, and the lessons
+created with it, while the club has not launched, and creates a draft afterwards. Its result says
+which happened: `published: true|false` and `publish_default: "pre_launch" | "launched" |
+"explicit"`. Read it rather than assuming, and put it in the report: "12 courses, published,
+because the club has not launched yet" is the sentence the owner needs, and it is also the one
+that tells them Launch will not publish anything twice.
 
 ## Categories: the trap
 
@@ -142,41 +155,56 @@ Check the tool exists first. If `generate_missing_covers` is not in `tools/list`
 an older MCP version that does not have it. Say so and skip this step entirely; do not try to
 fake it with `generate_cover` in a loop.
 
-Start with a dry run:
+Generation runs on the club's AI key, which is Carusela's unless the owner has set their own in
+admin > integrations. Either way it is counted against the club's daily cover limit.
+
+Start with a dry run. Its `club_launched` field decides everything below:
 
 ```
 generate_missing_covers  dry_run: true
 ```
 
-Tell the owner how many items have no cover and that each one this actually generates spends
-their own OpenAI credit, counted against the club's daily cover limit. Ask once. Do not generate
-a single image before they say go.
-
-Once they agree, run it in batches rather than one call for everything:
+**Before Launch, do not ask.** A club with no covers is a club of grey cards, and there is nobody
+to show them to yet. Finish every pre-launch batch of content by closing the cover backlog:
 
 ```
-generate_missing_covers  limit: 10
+generate_missing_covers  limit: 5
 ```
 
-Report each batch as it lands (generated, skipped, and how many are still missing) and share the
-club's URL so the owner can watch the cards fill in live rather than wait for a final count.
-Keep calling it with the same `limit` until `remaining_missing` is 0 or it stops on a refusal.
+Five is the default pre-launch, because a cover takes ten to twenty seconds and a batch has to
+come back. Keep calling it until `remaining_missing` is 0 or it stops on a refusal, and report
+each batch as it lands (generated, skipped, how many are still missing) with the club's URL, so
+the owner watches the cards fill in instead of waiting for a final count.
+
+**After Launch, ask once.** There the covers are appearing in front of members and the spend is a
+decision somebody should make on purpose. Tell the owner how many items have no cover and what it
+costs, ask, and generate nothing until they say go. Then the same loop, at whatever `limit` they
+agreed.
 
 A batch can end on `stopped_reason` before it runs out of items:
 
 - **`cover_generation_disabled`**: the club switched this off. Point the owner at
   admin > integrations > cover generation and stop; nothing else here can turn it back on.
-- **`openai_key_missing`**: the club has no OpenAI key on file. The owner sets it in
-  admin > integrations, not you; there is nowhere in MCP to hold that key.
+- **`openai_key_missing`**: the club has no AI key it can use. Carusela's platform key normally
+  covers this, so seeing it means the club is set to use its own and has not got one on file. The
+  owner either clears that setting or adds their key in admin > integrations. There is nowhere in
+  MCP to hold a key, so this is not something to retry.
 - **`cover_daily_limit_reached`**: the club's daily cap for the day is spent. Tell the owner how
   many items are still missing a cover, and that they can either come back tomorrow or raise the
   limit in the same admin > integrations screen.
+- **`presenter_image_not_in_bucket`** and **`presenter_image_unreadable`**: the club has a
+  presenter photo set, and it is not a file this club can read: a URL from somewhere else, or an
+  upload that did not land. Every remaining cover would fail the same way, which is why the run
+  stops rather than producing a backlog of images without the person who is supposed to be in
+  them. The owner re-uploads the photo in the club's first-run step or in admin > integrations;
+  do not clear the setting to get past it.
 
 Every one of these is the owner's call, not a bug to route around. Report the stop, name the
 fix, and move on to closing out the rest of the report.
 
 ## Report honestly
 
-At the end, say how many of each type, how many published versus draft, what was gated to which
-tier, and **what had no source**. If a category came out empty, say so rather than letting the
-owner find it.
+At the end, say how many of each type, how many published versus draft **and why**. Before
+Launch the answer is "published, because the club is not live yet", and an owner who is not told
+that will assume somebody has already seen it. Say what was gated to which tier, and **what had
+no source**. If a category came out empty, say so rather than letting the owner find it.
