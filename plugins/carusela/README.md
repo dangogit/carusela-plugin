@@ -53,6 +53,9 @@ obvious guess is wrong:
   through a `category` field. Only groups, courses and AI agents have a real one. A near miss
   attaches nothing, so `manage_category list` reports a usage count per category and an empty one
   is visible immediately.
+- **`tag` is printed on the card every member sees.** When moving courses from Schooler or another
+  platform, the source id goes in `import_source` / `import_ref`, never in `tag` or `tags`.
+  `seed-club-content` enforces this and `audit-club-content` finds the ones that got through.
 - **`difficulty` is a closed set** on recordings, tutorials and guides: `מתחילים`, `ביניים`,
   `מתקדמים`, `כל הרמות`. Anything else is refused by name with the four values in the message.
 - **The four library kinds have different create defaults.** A guide and an AI agent go live the

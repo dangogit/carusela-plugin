@@ -1,6 +1,6 @@
 ---
 name: seed-club-content
-description: Load a club's courses, recordings, tutorials, guides and AI agents through the Carusela MCP without losing fields or publishing things nobody reviewed. Use when somebody wants to import, migrate, bulk-create or restructure club content, or asks to turn an existing site, syllabus or video library into a club.
+description: Load a club's courses, recordings, tutorials, guides and AI agents through the Carusela MCP without losing fields or publishing things nobody reviewed. Use when somebody wants to import, migrate, bulk-create or restructure club content, or asks to turn an existing site, syllabus, video library or another course platform (Schooler, Rav Messer, Teachable) into a club.
 ---
 
 # Seed club content
@@ -27,6 +27,17 @@ on create while the club has not launched; let them.
 kind has no column for it. Find where the value belongs; do not create a different content type
 to hold it.
 
+**Never put another platform's id where a member can see it.** `tag` on a course, tutorial or
+guide is the chip on its card and in its header, and `tags` on a library item are labels and
+category joins. Every member reads them. `schooler:45334` in a tag is not bookkeeping, it is a
+string printed on every course the club sells. This has already happened on a real club.
+
+The source reference belongs in `import_source` (`"schooler"`) and `import_ref` (`"45334"`).
+Check the tool's input schema in `tools/list`: where a tool accepts those two fields, use them;
+where it does not yet, **do not store the reference in the club at all** and keep the mapping from
+source id to new id in your report to the owner instead. A `tag` is only ever a short word a
+member should see, like `חדש`.
+
 ## Order of work
 
 1. `list_my_clubs`, `get_config`, `get_club_overview`. Know the club before writing to it.
@@ -37,6 +48,24 @@ to hold it.
 5. Publish and gate deliberately.
 6. `audit-club-content`.
 7. Generate covers for what still has none. See Covers below.
+
+## Moving a club from another platform
+
+When the owner is leaving Schooler, Rav Messer, Teachable or similar, decide first what is moving:
+
+- **Content only** (courses, lessons, video links): the tools in this skill. Keep every source id
+  out of member-visible fields, as above, and report the id mapping.
+- **Members and their access too**: read `club-migration://contract` before any write. It is the
+  flow built for a whole-club move: a session, a validated manifest, a plan the owner approves once,
+  resumable batches. It asks for record hashes and file digests, so it needs a session that can run
+  code (Claude Code with a shell). If you cannot compute what it asks for, say so to the owner
+  rather than recreating members by hand.
+- **Payments never move.** No card numbers, CardCom tokens, Schooler credentials or active
+  subscriptions go into Carusela by any path. A member's paid access in the new club comes from a
+  fresh checkout; say that to the owner up front.
+
+Before the first write, run `list_content` for the types you are about to create. A club that
+already holds half of the import gets duplicates otherwise.
 
 ## Courses carry their lessons
 
