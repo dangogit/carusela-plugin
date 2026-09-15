@@ -108,7 +108,28 @@ list_content  type: "event"
 A home page with an upcoming-events block and only past events renders an empty block. Worth
 telling the owner even though nothing is broken.
 
-### 7. What earlier sessions already did
+### 7. Another platform's ids showing to members
+
+```
+list_content  type: "course"
+list_content  type: "tutorial"
+list_content  type: "guide"
+```
+
+Read `tag` on every item. Flag anything that is a reference rather than a word a member should
+read: `vendor:12345` (`schooler:45334`, `rav-messer:…`), a bare number, a URL. After an
+import from another platform this is the most likely finding, and it shows on every card.
+
+The fix is an update that clears it, `manage_course action: "update" id: … tag: ""` for a course,
+and the same `tag: ""` through `manage_library_item` for a tutorial or guide. If the tool accepts
+`import_source` and `import_ref` (check `tools/list`), move the reference there in the same
+update; otherwise report the id mapping to the owner rather than keeping it in the club.
+
+Recordings keep their labels in `tags`, which `list_content` does not return. Say that this part
+of the check did not run for recordings rather than reporting them clean. And never strip a value
+from `tags` that is a category name: that is how the item joins its category (check 3).
+
+### 8. What earlier sessions already did
 
 ```
 get_audit_log  source: "mcp"  limit: 50
