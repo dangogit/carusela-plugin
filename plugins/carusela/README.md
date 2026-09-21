@@ -34,9 +34,14 @@ You can also name one: "use audit-club-content".
 
 ## What this cannot do, by design
 
-Prices, offers, coupons, trials, instalments, order bumps and access tiers are **not** writable
-over MCP. They decide money and access, so they stay owner-confirmed actions in the Sales
-workspace. You can gate content against tiers a club already has; you cannot create one.
+Connect or change a payment terminal, or charge a member. Those stay in the Sales workspace.
+
+Prices, offers, coupons, trials, instalments, order bumps and access tiers ARE writable, and
+never in one step. `manage_membership_tier`, `manage_offer` and `manage_coupon` stage values on
+a draft, leaving live resources alone and new ones unpublished; `preview_commerce_changes`
+returns the exact proposal plus a short-lived single-use token; `apply_commerce_changes` spends
+that token on that proposal alone. Nothing a buyer can see moves until someone reads a proposal
+and says yes.
 
 Feature flags, the navigation rail and the home page's block layout are operator-controlled.
 
@@ -71,5 +76,8 @@ Design changes cannot be published without a preview: `preview_design_change` re
 human opens and a single-use token that `publish_design` spends. The skills require showing you
 that link first.
 
-Member names, emails and phone numbers are never returned by any tool. `get_member_stats` gives
-counts only.
+`get_member_stats` gives counts and nothing that identifies anyone — no name, email, phone or
+id — so the "how many" questions never open the directory. `list_members` and `get_member` do
+return contact details, because the member directory is the club's own data and the owner is
+the one asking. Audit-log arguments have their email addresses redacted regardless of which
+tool wrote them.

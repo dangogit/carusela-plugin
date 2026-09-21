@@ -15,8 +15,9 @@ you write to it.
 everyone below. That is a revenue decision wearing the clothes of a config change, and the owner
 makes it, not you. Propose the ladder, get agreement, then apply.
 
-**Never claim you set up a subscription.** You did not. Gating content by tier is not the same
-as creating a product, a price or a plan, and MCP cannot do the second thing at all.
+**Never claim you set up a subscription.** Gating content by tier is not the same as creating a
+product, a price or a plan. Those are separate tools with a separate approval step of their own
+(see below); if you have only gated content, say only that.
 
 ## Read the ladder first
 
@@ -66,15 +67,18 @@ The shape most clubs want, and the reasoning:
 Put the prerequisites free even when the course is paid. A member who cannot complete the setup
 cannot use what they bought, and support absorbs the difference.
 
-## When somebody asks for the thing MCP cannot do
+## When somebody asks for the price, not the gate
 
-"Set up a subscription", "make this cost 200 shekels", "add a coupon", "start a trial" — none of
-these are MCP-writable, and no amount of looking will find a tool. Prices, offers, coupons,
-trials, instalments, order bumps and the tiers themselves are owner-confirmed actions in the
-club's Sales workspace.
+"Set up a subscription", "make this cost 200 shekels", "add a coupon", "start a trial" — these
+are a different ring, not a closed door. `manage_membership_tier`, `manage_offer` and
+`manage_coupon` stage them on a draft, `preview_commerce_changes` turns the draft into a
+proposal the owner can read plus a single-use token, and `apply_commerce_changes` spends that
+token. Nothing a buyer can see moves until it does. `club-orientation` has the whole sequence.
 
-Say it in one sentence, say what you *can* do (gate the content once the tiers exist), and do
-that.
+So the answer is not "I cannot". It is: stage it, show the proposal, and wait for a real yes.
+A tier you stage this way is also a tier this skill can gate against afterwards — but only once
+it has been applied, because `min_tier_level` reads the ladder the club actually defines, not
+the one sitting in a draft.
 
 ## Verify
 
