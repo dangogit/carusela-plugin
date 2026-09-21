@@ -35,10 +35,13 @@ They load from their descriptions, so in practice you say what you want. You can
 
 ## What it will not do
 
+Connecting or changing a payment terminal, and charging anybody. Those stay in the Carusela
+Sales workspace.
+
 Prices, offers, coupons, trials, instalments, order bumps and the access tiers themselves are
-**not** writable over MCP. They decide money and access, so they stay owner-confirmed actions in
-the Carusela Sales workspace. Claude can gate content against tiers your club already has; it
-cannot create one, and it will tell you so rather than looking for a way around it.
+writable, but never in one step: Claude prepares them on a draft that changes nothing a buyer
+can see, shows you the exact proposal, and applies it only against a single-use token that the
+proposal you approved produced. If you did not read a proposal, nothing went live.
 
 Feature flags, the navigation rail and the home page layout are operator-controlled.
 
@@ -55,8 +58,11 @@ audit log".
 Design changes cannot be published without a preview: staging returns a link a human opens and a
 single-use token that publishing spends, and the skills require showing you that link first.
 
-Member names, email addresses and phone numbers are never returned by any tool. Member statistics
-are counts only.
+Claude can read your member directory — names, email addresses, phone numbers, join dates and
+subscription status — because it is your club's own data and you are the one asking. The
+statistics tool is the exception in the other direction: `get_member_stats` returns counts and
+nothing that identifies anyone, so "how many members do I have" never opens the directory at
+all. Email addresses in the audit log are redacted either way.
 
 ## Requirements
 

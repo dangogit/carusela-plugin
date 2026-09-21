@@ -40,6 +40,8 @@ Three read-only calls. They cost nothing and they answer most of what you were a
 | The user wants to | Tools |
 |---|---|
 | See what exists | `get_club_overview`, `list_content`, `get_config`, `get_member_stats` |
+| See who the members are | `get_member_stats` for counts, `list_members` and `get_member` for a person |
+| Set a tier, price, offer or coupon | `manage_membership_tier`, `manage_offer`, `manage_coupon`, then `preview_commerce_changes` and `apply_commerce_changes` |
 | Add or edit a course | `manage_course` (lessons come with it, in the same call) |
 | Add a recording, tutorial, guide or AI agent | `manage_library_item` |
 | Add an event or a group | `manage_event`, `manage_group` |
@@ -65,23 +67,48 @@ person can open, and `publish_design` spends that token. There is no way to publ
 without previewing. See `brand-a-club`.
 
 **Ring C is money and access.** Prices, offers, coupons, trials, tiers, the payment terminal.
-**MCP does not write any of it, by design.** You can *use* the tiers a club already has to gate
-content, but you cannot create a tier, set a price or make an offer. When a user asks for that,
-say plainly that it is done in the club's own Sales workspace and move on.
+**MCP stages it and a person approves it.** `manage_membership_tier`, `manage_offer` and
+`manage_coupon` prepare values on a draft and change nothing a buyer can see: a new resource
+stays unpublished or inactive, and a live one is left alone. `preview_commerce_changes` returns
+the exact proposal, a buyer preview and a short-lived, single-use confirmation token, and
+`apply_commerce_changes` spends that token on that proposal and no other. Show the proposal and
+wait for a real yes before you spend it. The token is the owner's signature; it is not a
+formality to collect on their behalf.
+
+Two things here are still not yours: connecting or changing the payment terminal, and charging
+anybody. `get_commerce_readiness` reads whether the club can sell at all, and it is the right
+first call when an offer is meant to go live rather than sit in a draft.
 
 ## What MCP will never do, so stop looking
 
-- Create or change prices, offers, coupons, trials, instalments or order bumps
-- Create or rename access tiers
+- Connect or change a payment terminal, or charge a member
 - Flip feature flags (`community`, `groups`, and the rest are operator-controlled)
 - Reorder the navigation rail or edit the home page's blocks
 - Touch a repository, a deployment, DNS or a domain
-- Read a member's name, email or phone. `get_member_stats` returns counts and nothing else
+- Make a commercial change live without a person approving it. The staging tools only write a
+  draft; `apply_commerce_changes` needs a token from a preview a human actually saw
 
-The first three have real doors: the Sales workspace, the admin settings, and "ask Carusela".
-Tell the user which door, and say plainly that this surface will not do it. Then carry on with
-the part you can do. A refusal the user cannot act on is worse than no answer, so the door is
-the part that matters.
+The first three have real doors: the club's own Sales workspace for the terminal, the admin
+settings, and "ask Carusela" for a feature flag. Tell the user which door, and say plainly that
+this surface will not do it. Then carry on with the part you can do. A refusal the user cannot
+act on is worse than no answer, so the door is the part that matters.
+
+## Member personal data: this surface can read it
+
+`get_member_stats` is counts and course display fields only -- never a name, an email, a phone or
+an id. When the question is "how many", that is the tool, and it stays the cheapest honest answer.
+
+`list_members` and `get_member` are a different matter, and this skill used to say they were not
+here at all. `list_members` is the club's directory: display name, email, phone, role, join date,
+suspension state, access level and subscription status, searchable by name, email or phone.
+`get_member` returns one person with their entitlements (no phone, no subscription status on that
+one). Both are ordinary reads an owner is entitled to make about their own club.
+
+Two things follow. Never tell an owner that this surface cannot see their members' details -- it
+can, and offering that as a reassurance is telling them something untrue about their members'
+privacy. And do not page the whole directory to answer a question a count would have answered:
+reach for `get_member_stats` first, and open a record when you need that specific person, usually
+to confirm who you are about to open or close access for.
 
 ## Three traps that cost real time
 
