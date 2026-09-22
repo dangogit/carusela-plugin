@@ -64,24 +64,33 @@ two steps: `preview_design_change` stages a draft and returns a single-use token
 person can open, and `publish_design` spends that token. There is no way to publish design
 without previewing. See `brand-a-club`.
 
-**Ring C is money and access.** Prices, offers, coupons, trials, tiers, the payment terminal.
-**MCP does not write any of it, by design.** You can *use* the tiers a club already has to gate
-content, but you cannot create a tier, set a price or make an offer. When a user asks for that,
-say plainly that it is done in the club's own Sales workspace and move on.
+**Ring C is money and access.** Prices, offers, coupons, trials, tiers, sales pages and
+funnels. It is written in two steps, like design, and only by an owner or admin: `manage_offer`,
+`manage_membership_tier` and `manage_coupon` stage a draft that changes nothing live,
+`preview_commerce_changes` returns the exact proposal, a buyer preview and a single-use token,
+and `apply_commerce_changes` spends that token after the person has said yes to what they saw.
+Read `get_commerce_catalog` first and `get_commerce_readiness` before promising a paid offer: a
+club with no payment terminal connected can stage an offer and cannot sell it. Sales pages and
+funnels follow the same draft, preview, publish shape. Nothing here ever charges a member or
+touches the terminal itself. The terminal is connected by hand in the admin, PAYMENTS tab.
+
+**Feature flags are the owner's, in the admin.** Whether the community, groups, events, the AI
+mentor or the agents page is on is switched in the admin under "יכולות המועדון", `/admin?tab=features`.
+MCP reads them through `get_config` and refuses to create content behind a flag that is off; it
+does not flip one. The door is that tab, not "ask Carusela".
 
 ## What MCP will never do, so stop looking
 
-- Create or change prices, offers, coupons, trials, instalments or order bumps
-- Create or rename access tiers
-- Flip feature flags (`community`, `groups`, and the rest are operator-controlled)
+- Charge a member, refund one, or connect or change the payment terminal
+- Publish a commercial change without a preview the person approved
 - Reorder the navigation rail or edit the home page's blocks
 - Touch a repository, a deployment, DNS or a domain
-- Read a member's name, email or phone. `get_member_stats` returns counts and nothing else
+- Read a member's contact details outside the member tools that hold the `member_pii` capability
 
-The first three have real doors: the Sales workspace, the admin settings, and "ask Carusela".
-Tell the user which door, and say plainly that this surface will not do it. Then carry on with
-the part you can do. A refusal the user cannot act on is worse than no answer, so the door is
-the part that matters.
+Each has a real door: the admin PAYMENTS tab, the preview step, the admin CHROME tab. Tell the
+user which door, and say plainly that this surface will not do it. Then carry on with the part
+you can do. A refusal the user cannot act on is worse than no answer, so the door is the part
+that matters.
 
 ## Three traps that cost real time
 

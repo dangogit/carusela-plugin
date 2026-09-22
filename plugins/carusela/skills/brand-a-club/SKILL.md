@@ -93,9 +93,9 @@ obvious in the image.
 ## What this flow will not change
 
 Refused here, with a real door elsewhere: tracking pixels and analytics ids (admin settings,
-ANALYTICS tab), the navigation rail (admin settings, CHROME tab), feature flags (operator only),
-the mentor's avatar and its allowed link areas (brand editor, mentor section), and anything in
-Ring C.
+ANALYTICS tab), the navigation rail (admin settings, CHROME tab), feature flags (admin,
+"יכולות המועדון" tab), the mentor's avatar and its allowed link areas (brand editor, mentor
+section), and anything in Ring C, which has its own preview-and-approve flow.
 
 ## After publishing
 

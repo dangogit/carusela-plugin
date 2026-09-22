@@ -66,15 +66,15 @@ The shape most clubs want, and the reasoning:
 Put the prerequisites free even when the course is paid. A member who cannot complete the setup
 cannot use what they bought, and support absorbs the difference.
 
-## When somebody asks for the thing MCP cannot do
+## When somebody asks for a price, an offer or a new tier
 
-"Set up a subscription", "make this cost 200 shekels", "add a coupon", "start a trial" — none of
-these are MCP-writable, and no amount of looking will find a tool. Prices, offers, coupons,
-trials, instalments, order bumps and the tiers themselves are owner-confirmed actions in the
-club's Sales workspace.
-
-Say it in one sentence, say what you *can* do (gate the content once the tiers exist), and do
-that.
+"Set up a subscription", "make this cost 200 shekels", "add a coupon", "start a trial": these are
+Ring C and they are written in two steps, never in one. Stage with `manage_membership_tier`,
+`manage_offer` or `manage_coupon`, show the person what `preview_commerce_changes` returns, and
+call `apply_commerce_changes` only after they approve that exact proposal. A new tier is not a
+rung of the ladder until it is applied, so gate content against it afterwards, not before. Check
+`get_commerce_readiness` before promising a paid offer: without a connected terminal it can be
+staged and cannot be sold.
 
 ## Verify
 

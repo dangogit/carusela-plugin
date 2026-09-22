@@ -34,11 +34,13 @@ You can also name one: "use audit-club-content".
 
 ## What this cannot do, by design
 
-Prices, offers, coupons, trials, instalments, order bumps and access tiers are **not** writable
-over MCP. They decide money and access, so they stay owner-confirmed actions in the Sales
-workspace. You can gate content against tiers a club already has; you cannot create one.
+Prices, offers, coupons, trials and access tiers decide money and access, so they are written
+in two steps: a tool stages a draft, a preview shows the exact proposal, and only the owner's
+explicit approval applies it. Nothing charges a member, and the payment terminal is connected by
+hand in the admin.
 
-Feature flags, the navigation rail and the home page's block layout are operator-controlled.
+Feature flags are switched by the owner in the admin under "יכולות המועדון". The navigation
+rail and the home page's block layout are edited in the admin as well.
 
 There are no repository, deploy, DNS or domain tools here, and the platform stores no
 corresponding credentials. Claude Code may already hold your own GitHub and Vercel sessions
