@@ -16,7 +16,8 @@ everyone below. That is a revenue decision wearing the clothes of a config chang
 makes it, not you. Propose the ladder, get agreement, then apply.
 
 **Never claim you set up a subscription.** You did not. Gating content by tier is not the same
-as creating a product, a price or a plan, and MCP cannot do the second thing at all.
+as creating a product, a price or a plan. The second thing is Ring C, and it goes through its own
+staged, approved flow, described below.
 
 ## Read the ladder first
 

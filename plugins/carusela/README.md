@@ -1,6 +1,6 @@
 # Carusela for Claude Code
 
-Run your club from Claude Code. This plugin connects the Carusela MCP and adds six skills that
+Run your club from Claude Code. This plugin connects the Carusela MCP and adds seven skills that
 keep an agent inside what the surface actually allows, so it stops guessing at fields that are
 refused on purpose and stops publishing things nobody reviewed.
 
@@ -26,6 +26,7 @@ If your account reaches more than one club, every tool needs a `club_id`. Ask Cl
 | `seed-club-content` | importing or bulk-creating courses, recordings, tutorials, guides and agents |
 | `brand-a-club` | colours, logo, favicon, social card, through the gated design flow |
 | `gate-club-access` | deciding what each access tier reaches |
+| `build-sales-funnel` | offers, coupons, a Sales page and its Funnel, each approved before it goes live |
 | `audit-club-content` | after an import or before a launch: what is invisible and why |
 | `tune-club-mentor` | making the club's AI assistant answer from the club's own material |
 
@@ -36,11 +37,13 @@ You can also name one: "use audit-club-content".
 
 Prices, offers, coupons, trials and access tiers decide money and access, so they are written
 in two steps: a tool stages a draft, a preview shows the exact proposal, and only the owner's
-explicit approval applies it. Nothing charges a member, and the payment terminal is connected by
-hand in the admin.
+explicit approval applies it. Sales pages, Funnels and A/B tests publish through the same kind of
+single-use token. Nothing charges a member, and the payment terminal is connected by hand in the
+admin.
 
 Feature flags are switched by the owner in the admin under "יכולות המועדון". The navigation
-rail and the home page's block layout are edited in the admin as well.
+rail is edited in the admin as well. The home page's block list is a design change, previewed
+and published like colours.
 
 There are no repository, deploy, DNS or domain tools here, and the platform stores no
 corresponding credentials. Claude Code may already hold your own GitHub and Vercel sessions
@@ -73,5 +76,6 @@ Design changes cannot be published without a preview: `preview_design_change` re
 human opens and a single-use token that `publish_design` spends. The skills require showing you
 that link first.
 
-Member names, emails and phone numbers are never returned by any tool. `get_member_stats` gives
-counts only.
+Member names, emails and phone numbers come back only from the member tools, such as
+`list_members` and `get_member`, which only the club's owner and admins can use. `get_member_stats`
+gives counts only.

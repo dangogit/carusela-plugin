@@ -1,7 +1,8 @@
 # Carusela for Claude Code
 
 Run your [Carusela](https://carusela.com) club from Claude Code. Build courses, upload a library,
-brand the club, set access tiers and configure its AI mentor, by talking to Claude.
+brand the club, set access tiers, build sales pages and funnels and configure its AI mentor, by
+talking to Claude.
 
 ```
 /plugin marketplace add dangogit/carusela-plugin
@@ -19,7 +20,7 @@ The connection on its own gives Claude the tools. It does not tell Claude how th
 shaped, so it guesses, and several of the natural guesses are quietly wrong: content created live
 when you wanted a draft, a category that looks attached and is not, a tier that does not exist.
 
-The six skills are the part that stops that.
+The seven skills are the part that stops that.
 
 | skill | what it is for |
 |---|---|
@@ -27,6 +28,7 @@ The six skills are the part that stops that.
 | `seed-club-content` | importing or bulk-creating content without losing fields or publishing early |
 | `brand-a-club` | colours, logo, favicon and social card, through the preview-then-publish gate |
 | `gate-club-access` | what each access tier reaches |
+| `build-sales-funnel` | offers, coupons, a sales page and its funnel, each approved by you before it goes live |
 | `audit-club-content` | what got created successfully and is still invisible |
 | `tune-club-mentor` | making the club's AI assistant answer from your own material |
 
@@ -35,12 +37,14 @@ They load from their descriptions, so in practice you say what you want. You can
 
 ## What it will not do
 
-Prices, offers, coupons, trials, instalments, order bumps and the access tiers themselves are
-**not** writable over MCP. They decide money and access, so they stay owner-confirmed actions in
-the Carusela Sales workspace. Claude can gate content against tiers your club already has; it
-cannot create one, and it will tell you so rather than looking for a way around it.
+Prices, offers, coupons, trials, instalments and member tiers decide money and access, so Claude
+never changes them in one step. It stages a draft, shows you the exact proposal and a buyer
+preview, and applies it only after you say yes. Sales pages, funnels and A/B tests go live the same
+way. Claude never charges or refunds a member, and it cannot connect your CardCom terminal: you do
+that yourself in the admin, under payments.
 
-Feature flags, the navigation rail and the home page layout are operator-controlled.
+Feature flags are yours to switch in the admin under "יכולות המועדון", and the navigation rail is
+edited in the admin as well. Claude does neither.
 
 There are no repository, deploy, DNS or domain tools here, and Carusela stores no such
 credentials. Claude Code may already hold your own GitHub and Vercel sessions on your machine;
@@ -52,10 +56,12 @@ Every call is written to your club's audit log with `source: "mcp"`, including t
 failed and the arguments they carried, with email addresses redacted. Ask Claude to "show the
 audit log".
 
-Design changes cannot be published without a preview: staging returns a link a human opens and a
-single-use token that publishing spends, and the skills require showing you that link first.
+Design, commercial, sales page and funnel changes cannot go live without a preview: staging
+returns what would change and a single-use token that publishing spends, and the skills require
+showing it to you first.
 
-Member names, email addresses and phone numbers are never returned by any tool. Member statistics
+Member names, email addresses and phone numbers come back only from the member tools, such as
+`list_members` and `get_member`, which only the club's owner and admins can use. Member statistics
 are counts only.
 
 ## Requirements
