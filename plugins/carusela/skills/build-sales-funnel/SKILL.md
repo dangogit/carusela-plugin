@@ -1,6 +1,6 @@
 ---
 name: build-sales-funnel
-description: Build and publish a Carusela Sales page and its Funnel (Order bumps, Upsells, Downsells and the Thank You page) through the Carusela MCP, with every price and every publication approved by a person first. Use when somebody wants to sell a course or a membership, set up a sales page, a checkout, an order bump, an upsell or downsell, a thank-you page, a coupon for a launch, an A/B test between funnel versions, or to roll a sales page or funnel back.
+description: Build and publish a Carusela Sales page and its Funnel (Order bumps, Upsells, Downsells and the Thank You page) through the Carusela MCP, with every price and every publication approved by a person first. Use when somebody wants to sell a course or a membership, set up a sales page (from blocks, as their own designed HTML page, or on their own site), a checkout, an order bump, an upsell or downsell, a thank-you page (designed HTML pages for upsells and the thank-you included), a coupon for a launch, an A/B test between funnel versions, or to roll a sales page or funnel back.
 ---
 
 # Build a sales funnel
@@ -31,11 +31,13 @@ CardCom terminal is connected by a person, by hand, at `/admin?tab=payments`. Ne
 terminal credentials and never send them through MCP. Everything in this skill can be drafted
 while the terminal is missing; nobody can pay until it is connected.
 
-**Never author design or topology.** A Sales page is built only from the blocks
-`get_landing_page_catalog` returns, with no colours, CSS, class names, raw HTML, scripts or
-iframes; the page follows the club's current published brand on every render. A Funnel is a list
-of Order bumps, an ordered list of steps and a Thank You; the server derives the graph, the node
-ids and whether each step is an Upsell or a Downsell.
+**Never mix the two page kinds, and never author topology.** A Sales page is either built from
+the blocks `get_landing_page_catalog` returns (no colours, CSS, class names, raw HTML, scripts or
+iframes inside a block; the page follows the club's published brand on every render), or it is
+one designed HTML page the owner wants, uploaded whole and shown in a sandbox (see "A designed
+page"). A designed page is the draft's only block. A Funnel is a list of Order bumps, an ordered
+list of steps and a Thank You; the server derives the graph, the node ids and whether each step
+is an Upsell or a Downsell.
 
 **Never send half a document.** Both `edit_sales_page_draft` and `edit_sales_funnel_draft`
 replace the whole draft. A step whose `content` you leave out loses its authored copy, and an
@@ -155,9 +157,8 @@ create_sales_page  { request_id, product_kind, product_id, offer_id, title, slug
 - `entry_mode` is `hosted` (the default: Carusela serves the page) or `external`.
 - **An external page is the club's own site.** Pass `external_url`: a public `https` address
   with no query, fragment, port or credentials. The content stays on that site, and its buy
-  button links to the Carusela checkout on the club's own address. The link to paste there is
-  copied from the page's screen in the admin once the page is published. An external page takes
-  no `seed_fields` and no `lesson_ids`.
+  button links to the Carusela checkout on the club's own address. An external page takes no
+  `seed_fields` and no `lesson_ids`.
 - `seed_fields` (`title`, `cover`, `description`, `instructor`) and `lesson_ids` (up to 100,
   published lessons of that course only) copy course material into the first draft. A member
   tier page cannot seed from a course.
@@ -180,6 +181,56 @@ The document is `{ schemaVersion: 1, slug, title, seo: { title, description, ogI
 blocks }`, with up to 100 blocks, each id unique. Validate before saving. Re-read after every
 save, because the draft revision moves. Do not copy any `brand_kit` value into a block.
 
+To switch an existing page between hosted and external, or change its external address:
+
+```
+set_sales_page_entry  { page_id, expected_draft_revision, entry_mode, external_url? }
+```
+
+It saves into the draft (a hosted page takes no `external_url`), so the switch reaches buyers only
+through the publish below. Once an external page is published:
+
+```
+get_sales_page_external_integration  { page_id }
+  -> checkout_url, snippets (HTML, React, Next.js), claude_code_instructions, connection
+```
+
+The buy link on the club's site is an ordinary `<a href="{checkout_url}">` in the same window,
+never an iframe, popup, form post or script, and the snippets forward the campaign parameters.
+When you can edit the club's site in this session, follow `claude_code_instructions` and deploy it
+with the site's own tooling. `connection` shows the result of the last link test: a person starts
+it on the page's admin screen, then clicks the buy link on the club's site in the same browser. An
+ordinary buyer's click is not detected on its own.
+
+#### A designed page
+
+When the owner wants their own design rather than blocks (a long page, their own layout, many
+images), write one HTML page and upload it:
+
+```
+save_sales_funnel_page  { page_id, html }  -> page_sha256
+```
+
+Then make it the draft's only block with `edit_sales_page_draft`:
+`{ type: "customPage", variant: "full", props: { pageSha256 } }`. The rules, which the
+`customPage` entry in `get_landing_page_catalog` states as well:
+
+- One complete, self-contained, responsive HTML document, at most 256 KiB of UTF-8, with its own
+  `<style>` and `<script>`. Upload images with `attach_media` and use their `https` URLs.
+- A buy button carries `data-carusela-buy`, or is a link to `href="#carusela-buy"`. A click sends
+  the buyer to this page's own Carusela checkout; nothing inside the page can charge.
+- A video slot is an element with `data-carusela-video="<YouTube, Vimeo or Bunny URL>"` and an
+  explicit size or `aspect-ratio`. Carusela draws the player over it; other providers get none.
+- Size full-screen sections with `var(--carusela-viewport-height, 100vh)`, never bare `vh`,
+  `dvh` or `svh`, which measure the frame and make the page scroll inside a fixed window.
+- The page runs in a sandbox with an opaque origin: no cookies, storage, club API or form posts.
+  `#section` links scroll, every other link opens a new tab. The browser title, description and
+  share image come from the draft's `title` and `seo`, not from the HTML.
+- The same HTML always has the same hash and a stored page never changes. To change the page,
+  upload the new HTML and save the draft with the new hash.
+
+Uploading needs the `commerce` capability; editing the draft needs `content_edit`.
+
 Publishing:
 
 ```
@@ -198,7 +249,7 @@ appends the old document as a new version and edits nothing.
 
 ```
 get_sales_funnel             { page_id }
-list_funnel_followup_offers  { page_id, page?, limit?, query? }
+list_funnel_followup_offers  { page_id, role?, page?, limit?, query? }
 edit_sales_funnel_draft      { page_id, expected_draft_revision, expected_live_version, draft }
 preview_sales_funnel         { page_id, expected_draft_revision, expected_live_version, draft }
 confirm_sales_funnel_publish { page_id }
@@ -217,11 +268,20 @@ The draft is `{ orderBumps, steps, thankYou }`:
   buyer meets them. `id` matches `^[a-z0-9-]{1,40}$`. `onAccept` and `onDecline` are another
   step's id or `"thank_you"`, never the step's own id, and no arrangement may let a buyer reach
   the same step twice. `content` is `{ headline?, body?, acceptLabel?, declineLabel?,
-  timerSeconds? }`, at most 200, 2000, 60 and 60 characters, and a timer of 30 to 3600 seconds.
-  A field left out falls back to copy derived from the offer.
-- `thankYou`: `{ heading, body?, nextAction? }`. `heading` up to 200 characters, `body` up to
-  2000, and `nextAction` is `{ label, href }` where `href` is a path on the club's site or an
-  `https` address.
+  timerSeconds?, pageSha256? }`, at most 200, 2000, 60 and 60 characters, and a timer of 30 to
+  3600 seconds. A field left out falls back to copy derived from the offer.
+- `thankYou`: `{ heading, body?, nextAction?, pageSha256? }`. `heading` up to 200 characters,
+  `body` up to 2000, and `nextAction` is `{ label, href }` where `href` is a path on the club's
+  site or an `https` address. Without a `nextAction`, the button leads to what was bought: the
+  course for a course purchase, the club home for a member tier.
+
+**A designed step or Thank You.** Upload the owner's HTML with `save_sales_funnel_page` (the same
+rules and the same `page_id` as a designed Sales page) and put the returned hash on the step's
+`content.pageSha256` or on `thankYou.pageSha256`, keeping every other field of the draft. The page
+is shown in the same sandbox above a fixed Carusela bar: on a step the bar carries the price, the
+terms and the only accept and decline buttons; on the Thank You it carries the receipt and the next
+action. A buy button inside the owner's HTML does nothing there, so do not tell the owner it will.
+A hash this club never stored is refused with `page_not_found`.
 
 **Upsell or Downsell is derived, not chosen.** A step reached only by declines is a Downsell;
 every other step is an Upsell. Arrange `onAccept` and `onDecline` to get the shape the owner
@@ -237,8 +297,8 @@ wants, then check the kinds in the preview.
 - An Order bump needs a primary offer that is a one-time course offer. The bump itself is a
   one-time course offer that costs more than 0, is not the primary offer, is not any step's offer
   and is not listed twice. When the primary offer allows instalments, the bump must allow
-  instalments too, with a maximum at least as high. No tool lists bump candidates, so check this
-  against `get_commerce_catalog` yourself; the save refuses a bump that fails it.
+  instalments too, with a maximum at least as high. `list_funnel_followup_offers` with
+  `role: "order_bump"` returns exactly the offers that pass these rules.
 - Unpublished offers may sit in a draft. Publication needs them published.
 
 Save with `edit_sales_funnel_draft`, then show the person what a buyer meets:
@@ -301,6 +361,7 @@ null keeps the live one. Say which of the two the person is approving before you
 | `order_bump_offer_unavailable` | the bump offer fails the bump rules | pick another one-time course offer |
 | `duplicate_step_offer`, `step_self_target`, `step_target_unknown`, `step_target_cycle` | the step list cannot be walked | fix the ids and targets |
 | `max_steps_exceeded`, `max_bumps_exceeded` | more than 12 steps or 3 bumps | trim |
+| `page_not_found` | a `pageSha256` this club never uploaded | `save_sales_funnel_page` first, then use the hash it returns |
 | `funnel_products_unpublished` | an offer or product in the Funnel is unpublished | apply the commerce changes first, or publish through the commerce batch |
 | no saved Funnel draft to publish | nothing to bind a token to | `edit_sales_funnel_draft` first |
 | `legacy_document_not_representable` | the old two-offer document shape was sent for a Funnel with bumps or more than two steps | send `{ orderBumps, steps, thankYou }` |
@@ -314,3 +375,7 @@ Read back, do not trust the receipt alone: `get_sales_page` for the published ve
 `readiness.activate`, `get_sales_funnel` for the live version. Tell the owner what is live, what
 a buyer meets on each branch, and what still stands between the page and its first buyer, most
 often the CardCom connection or the club's launch.
+
+What happens after payment is not configured here. A buyer who had no account is signed in
+automatically in the browser that paid, and still receives the access email. An existing member
+signs in the usual way.
