@@ -28,7 +28,7 @@ The seven skills are the part that stops that.
 | `seed-club-content` | importing or bulk-creating content without losing fields or publishing early |
 | `brand-a-club` | colours, logo, favicon and social card, through the preview-then-publish gate |
 | `gate-club-access` | what each access tier reaches |
-| `build-sales-funnel` | offers, coupons, a sales page and its funnel, each approved by you before it goes live |
+| `build-sales-funnel` | offers, coupons, a sales page (blocks, your own designed HTML page, or your own site) and its funnel, each approved by you before it goes live |
 | `audit-club-content` | what got created successfully and is still invisible |
 | `tune-club-mentor` | making the club's AI assistant answer from your own material |
 

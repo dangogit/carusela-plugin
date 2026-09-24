@@ -26,7 +26,7 @@ If your account reaches more than one club, every tool needs a `club_id`. Ask Cl
 | `seed-club-content` | importing or bulk-creating courses, recordings, tutorials, guides and agents |
 | `brand-a-club` | colours, logo, favicon, social card, through the gated design flow |
 | `gate-club-access` | deciding what each access tier reaches |
-| `build-sales-funnel` | offers, coupons, a Sales page and its Funnel, each approved before it goes live |
+| `build-sales-funnel` | offers, coupons, a Sales page (blocks, a designed HTML page, or the club's own site) and its Funnel, each approved before it goes live |
 | `audit-club-content` | after an import or before a launch: what is invisible and why |
 | `tune-club-mentor` | making the club's AI assistant answer from the club's own material |
 
